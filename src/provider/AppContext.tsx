@@ -6,11 +6,9 @@ import {
     createKid,
     Entry,
     EntryType,
-    IContact, IDrVisit,
-    IFirst, IImmunization,
-    IKid, IMeasurement, IPrescription,
-    IStory
+    IContact, IKid
 } from "../models/models";
+import {compareAsc} from "date-fns/fp";
 
 export enum Mode {
     kids = 'Kids',
@@ -27,12 +25,7 @@ interface IAppContextType {
     setCurrentActivity: (mode: EntryType|null) => void;
     kids: IKid[]|undefined;
     contacts: IContact[]|undefined;
-    getStories: () => IStory[];
-    getFirsts: () => IFirst[];
-    getMeasurements: () => IMeasurement[];
-    getPrescriptions: () => IPrescription[];
-    getImmunizations: () => IImmunization[];
-    getDrVisits: () => IDrVisit[];
+    getEntries: () => Entry[]
 }
 
 function useAppContextData(importedData: IDatabaseData): IAppContextType {
@@ -52,15 +45,13 @@ function useAppContextData(importedData: IDatabaseData): IAppContextType {
         setContacts(contacts);
 
         const entries = importedData.entries.map(x => createEntry(x, kids, contacts));
+        entries.sort( (a, b) => compareAsc(a.date, b.date));
         setEntries(entries);
     }, [importedData]);
-
-    const getStories = (): IStory[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.Story).map(x => x as IStory) || [];
-    const getFirsts = (): IFirst[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.Firsts).map(x => x as IFirst) || [];
-    const getMeasurements = (): IMeasurement[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.Measurements).map(x => x as IMeasurement) || [];
-    const getPrescriptions = (): IPrescription[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.Prescriptions).map(x => x as IPrescription) || [];
-    const getImmunizations = (): IImmunization[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.Immunization).map(x => x as IImmunization) || [];
-    const getDrVisits = (): IDrVisit[] => entries?.filter(x => x.child.pk === currentChild?.pk && x.type === EntryType.DrVisits).map(x => x as IDrVisit) || [];
+    const getEntries = (): Entry[] =>
+        entries?.filter(x =>
+            (currentChild === null || x.child.pk === currentChild?.pk) &&
+            (currentActivity === null || x.type === currentActivity)) || [];
 
     return {
         currentChild,
@@ -71,12 +62,7 @@ function useAppContextData(importedData: IDatabaseData): IAppContextType {
         setCurrentActivity,
         kids,
         contacts,
-        getStories,
-        getFirsts,
-        getMeasurements,
-        getPrescriptions,
-        getImmunizations,
-        getDrVisits,
+        getEntries,
     };
 }
 

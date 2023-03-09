@@ -152,7 +152,7 @@ export interface IImmunization extends IEntry {
 }
 function getImmunization(data: IDbEntry, entry: IEntry, contacts: IContact[]): IImmunization {
     const contact = contacts.find(x => x.pk === data.contact_id);
-    if(!contact) console.warn(`Could not find contact with id '${data.contact_id}' for immunization entry '${entry.pk}'`);
+    // if(!contact) console.warn(`Could not find contact with id '${data.contact_id}' for immunization entry '${entry.pk}'`);
     return {
         ...entry,
         contact,

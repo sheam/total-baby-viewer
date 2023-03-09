@@ -1,9 +1,8 @@
 import {ChangeEvent, ReactElement} from "react";
 import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {Mode, useAppContext} from "../provider/AppContext";
-import {StyledNav} from "./styled";
+import {Label, StyledNav} from "./styled";
 import {EntryType} from "../models/models";
 
 const ALL = 'none';
@@ -40,27 +39,27 @@ export const NavigationControl = (): ReactElement => {
         }
     };
 
-    console.log(`current activity = ${context.currentActivity}`);
-    const showActivityControls = context.mode == Mode.activities;
+    console.log(`current mode = ${context.mode}`);
+    const showActivityControls = context.mode === Mode.activities;
     const activityNames = Object.values(EntryType).filter(x => typeof (x) === 'string');
     const currentActivityName = context.currentActivity !== null ? EntryType[context.currentActivity] : ALL;
 
     return (
         <StyledNav>
-            <Form>
-                <Row>
                     <Col>
-                        <Form.Label>Showing:</Form.Label>
+                        <Label className='text-right'>Showing:</Label>
                     </Col>
                     <Col>
                         <Form.Select value={context.mode || Mode.kids} onChange={onModeChange} size='sm'>
-                            {Object.values(Mode).map(m => <option key={m} value={m}>{m}</option>)}
+                            <option value={Mode.kids}>Kids</option>
+                            <option value={Mode.contacts}>Contacts</option>
+                            <option value={Mode.activities}>Activies</option>
                         </Form.Select>
                     </Col>
 
                     {showActivityControls && <>
                         <Col>
-                            <Form.Label>Child:</Form.Label>
+                            <Label className='text-right'>Child:</Label>
                         </Col>
                         <Col sm={4}>
                             <Form.Select value={context.currentChild?.pk || ALL} onChange={onChildChange} size='sm'>
@@ -70,7 +69,7 @@ export const NavigationControl = (): ReactElement => {
                         </Col>
 
                         <Col>
-                            <Form.Label>Activity:</Form.Label>
+                            <Label className='text-right'>Activity:</Label>
                         </Col>
                         <Col sm={3}>
                             <Form.Select value={currentActivityName} onChange={onActivityChange} size='sm'>
@@ -79,10 +78,6 @@ export const NavigationControl = (): ReactElement => {
                             </Form.Select>
                         </Col>
                     </>}
-                </Row>
-                <Form.Group>
-                </Form.Group>
-            </Form>
         </StyledNav>
     );
 };
